@@ -10,12 +10,12 @@ It is licensed under the Apache 2 license.
 
 ## Implementations available
 
-| Implementation      | Version          | Profile name    |
-|---------------------|------------------|-----------------|
-| Apache BVal         | `1.1.2`          | `bval`          |
-| Hibernate Validator | `5.4.1.Final`    | `hv-5`          |
-| Hibernate Validator | `6.0.0.CR3`      | `hv-6-stable`   |
-| Hibernate Validator | `6.0.0-SNAPSHOT` | `hv-6-snapshot` |
+| Implementation      | Version          | Profile name      |
+|---------------------|------------------|-------------------|
+| Apache BVal         | `1.1.2`          | `bval`            |
+| Hibernate Validator | `5.4.1.Final`    | `hv-5.4`          |
+| Hibernate Validator | `6.0.0.CR3`      | `hv-6.0-stable`   |
+| Hibernate Validator | `6.0.0-SNAPSHOT` | `hv-6.0-snapshot` |
 
 ## Running a benchmark
 
@@ -46,7 +46,7 @@ is your entry point to run the benchmark.
 Let's say you want to run a full benchmark for Hibernate Validator `5.4.1.Final`:
 
 ```
-./runner.sh 1 hv-5
+./runner.sh 1 hv-5.4
 ```
 
 The above command will run the benchmark once for the `hv-5` profile (see the available
@@ -56,13 +56,13 @@ profile names in the table above).
 Now, let's run it five times:
 
 ```
-./runner.sh 5 hv-5
+./runner.sh 5 hv-5.4
 ```
 
 You can also run a particular test with the following command:
 
 ```
-./runner.sh 1 hv-5 checkRawValidationSpeed
+./runner.sh 1 hv-5.4 checkRawValidationSpeed
 ```
 
 The following tests are available:

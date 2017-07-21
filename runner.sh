@@ -65,10 +65,10 @@ then
     exit
 fi
 
-if [ "$2" != "bval" ] && [ "$2" != "hv-5" ] && [ "$2" != "hv-6-stable" ] && [ "$2" != "hv-6-snapshot" ]
+if [ "$2" != "bval" ] && [ "$2" != "hv-5.4" ] && [ "$2" != "hv-6.0-stable" ] && [ "$2" != "hv-6.0-snapshot" ]
 then
     echo "Error"
-    echo "You must specify a profile, either bval, hv-5, hv-6-stable or hv-6-snapshot"
+    echo "You must specify a profile, either bval, hv-5.4, hv-6.0-stable or hv-6.0-snapshot"
     exit
 fi
 
