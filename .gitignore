@@ -15,3 +15,7 @@ bin/
 *.*~
 .*.swp
 .*.swo
+
+# Scenario files
+scenario.properties
+src/main/resources/generator.properties
