@@ -23,19 +23,24 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.apache.bval</groupId>
-        <artifactId>bval-parent</artifactId>
-        <version>0.2-incubating-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>jsr303-impl-bench</artifactId>
+    <groupId>org.hibernate.beanvalidation.benchmark</groupId>
+    <artifactId>beanvalidation-benchmark</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Apache Bean Validation :: jsr303-impl-bench (optional)</name>
+    <name>Bean Validation - Benchmark</name>
     
-    <properties>
-        <apache-bval.version>0.1-incubating</apache-bval.version>
-        <hibernate-val.version>4.1.0.CR1</hibernate-val.version>
+        <properties>
+        <apache-bval.version>1.1.2</apache-bval.version>
+        <hibernate-validator-5.version>5.4.1.Final</hibernate-validator-5.version>
+        <hibernate-validator-6-stable.version>6.0.0-SNAPSHOT</hibernate-validator-6-stable.version>
+        <hibernate-validator-6-snapshot.version>6.0.0-SNAPSHOT</hibernate-validator-6-snapshot.version>
+        <beanvalidation-1.version>1.1.0.Final</beanvalidation-1.version>
+        <beanvalidation-2.version>2.0.0.CR3</beanvalidation-2.version>
+
+        <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
+        <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+        <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -50,19 +55,9 @@
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>1.0.0.GA</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.bval</groupId>
-            <artifactId>org.apache.bval.bundle</artifactId>
-            <version>${apache-bval.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate-val.version}</version>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.1-b08</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -83,21 +78,140 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>build</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-beangraph</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>bval</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <beanvalidation-impl.name>Apache BVal</beanvalidation-impl.name>
+                <beanvalidation-impl.short-name>bval</beanvalidation-impl.short-name>
+                <beanvalidation-impl.version>${apache-bval.version}</beanvalidation-impl.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.bval</groupId>
+                    <artifactId>org.apache.bval.bundle</artifactId>
+                    <version>${apache-bval.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${beanvalidation-1.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-5.4</id>
+            <properties>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+                <beanvalidation-impl.version>${hibernate-validator-5.version}</beanvalidation-impl.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${hibernate-validator-5.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${beanvalidation-1.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-6-stable</id>
+            <properties>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+                <beanvalidation-impl.version>${hibernate-validator-6-stable.version}</beanvalidation-impl.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.validator</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${hibernate-validator-6-stable.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${beanvalidation-2.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-6-snapshot</id>
+            <properties>
+                <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+                <beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+                <beanvalidation-impl.version>${hibernate-validator-6-snapshot.version}</beanvalidation-impl.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate.validator</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${hibernate-validator-6-snapshot.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${beanvalidation-2.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
-            <!-- TODO: Config JAXB (CodeModel) for JDK 1.5 -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <environmentVariables>
+                        <beanvalidation-impl.name>${beanvalidation-impl.name}</beanvalidation-impl.name>
+                        <beanvalidation-impl.short-name>${beanvalidation-impl.short-name}</beanvalidation-impl.short-name>
+                        <beanvalidation-impl.version>${beanvalidation-impl.version}</beanvalidation-impl.version>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.5</version>
+                <version>${build-helper-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -116,11 +230,10 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1</version>
+                <version>${exec-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>create-beangraph</id>
-                        <phase>generate-test-sources</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
@@ -132,26 +245,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>jboss-public-repository-group</id>
-            <name>JBoss Public Maven Repository Group</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>Java.net Maven 2 Repository</id>
-            <url>http://download.java.net/maven/2/</url>
-        </repository>
-    </repositories>
 
 </project>

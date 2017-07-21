@@ -22,38 +22,34 @@
 # Runs all the available test case scenarios defined in
 # scenarioX.properties files
 #
-# The JSR303 impl to test is passed as first param.
-# Possible values:
-#   - Apache
-#   - Hibernate
-#
 
 
 PROPERTIES_FILE="src/main/resources/generator.properties"
-
-# Will iterate 20 times for each scenario, using seeds from 1 to 20
-SEED_LOW=1
-SEED_HIGH=20
 
 ## 
 # Benchmarks a given scenario
 #
 # params:
 #   $1 - file containing the scenario properties
-#   $2 - unit test to run
+#   $2 - number of iterations
+#   $3 - maven profile to use
+#   $4 - unit test to run
 bench_scenario() {
     # set the scenario rules
     cp $1 $PROPERTIES_FILE
-    mvn clean
 
-    # run the scenario ($SEED_HIGH - $SEED_LOW) times
-    for it in `seq $SEED_LOW $SEED_HIGH`
+    if [[ "$4" != "" ]]
+    then
+        test_to_run="BenchTest#$4"
+    else
+        test_to_run="BenchTest"
+    fi
+
+    # run the scenario $2 times
+    for it in `seq 1 $2`
     do
-        mvn -Dtest=$2 -Dgenerator.rnd.seed=$it -DargLine="-Dtester.repetitions=50" test
+        mvn -P$3 -Dtest=${test_to_run} -Dgenerator.rnd.seed=$it test
     done
-
-    # copy the results back to the current dir
-    cp target/$2"-results.txt" $1"-"$2".txt"
 }
 
 
@@ -62,10 +58,17 @@ bench_scenario() {
 # Check that a valid impl has been specified
 #
 
-if [ "$1" != "Apache" ] && [ "$1" != "Hibernate" ];
+if ! [[ "$1" = *[[:digit:]]* ]]
 then
     echo "Error"
-    echo "You must specify either Apache or Hibernate to test"
+    echo "You must specify a number of iterations"
+    exit
+fi
+
+if [ "$2" != "bval" ] && [ "$2" != "hv-5" ] && [ "$2" != "hv-6-stable" ] && [ "$2" != "hv-6-snapshot" ]
+then
+    echo "Error"
+    echo "You must specify a profile, either bval, hv-5, hv-6-stable or hv-6-snapshot"
     exit
 fi
 
@@ -78,7 +81,7 @@ shopt -s nullglob
 
 for test_props in scenario?.properties
 do
-    bench_scenario $test_props $1"Test"
+    bench_scenario $test_props $1 $2 $3
     let "tests_run += 1"
 done
 

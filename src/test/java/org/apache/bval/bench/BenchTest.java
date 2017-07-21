@@ -14,11 +14,18 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
- * under the License.    
+ * under the License.
  */
 package org.apache.bval.bench;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.CyclicBarrier;
+
+import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import org.apache.bval.bench.generated.Holder;
@@ -29,10 +36,10 @@ import org.junit.Test;
 
 /**
  * A simple unit test that benchmarks a validator impl.
- * 
+ *
  * @author Carlos Vara
  */
-public abstract class AbstractBenchTest {
+public class BenchTest {
 
 
     private static Holder holder;
@@ -69,7 +76,9 @@ public abstract class AbstractBenchTest {
     /**
      * @return A concrete implementation of the validator factory.
      */
-    public abstract ValidatorFactory getValidatorFactory();
+    public ValidatorFactory getValidatorFactory() {
+        return Validation.byDefaultProvider().configure().buildValidatorFactory();
+    }
 
 
     /**
@@ -232,6 +241,10 @@ public abstract class AbstractBenchTest {
         mtElapsed = 0l;
     }
 
+    @AfterClass
+    public static void printValidatorName() {
+        System.out.println(System.getenv("beanvalidation-impl.name") + " - " + System.getenv("beanvalidation-impl.version"));
+    }
 
     /**
      * After all tests are run, print the results.
@@ -243,6 +256,21 @@ public abstract class AbstractBenchTest {
         System.out.printf("  Raw parsing time:         %6dms {%d}\n", rpTime / 1000000l, rpDescs);
         System.out.printf("  First parse and validate: %6dms {%d}\n", fpavTime / 1000000l, fpavErrors);
         System.out.printf("  Multithreaded validation: %6dms \n", mtElapsed / 1000000l);
+    }
+
+    @AfterClass
+    public static void printResultsToFile() throws IOException {
+        FileWriter fw = new FileWriter("target/" + System.getenv("beanvalidation-impl.short-name") + "-" + System.getenv("beanvalidation-impl.version")
+                + "-results.txt", true);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        fw.write(dateFormat.format(new Date()));
+        fw.write(" " + (rvTime / 1000000l));
+        fw.write(" " + (rpTime / 1000000l));
+        fw.write(" " + (fpavTime / 1000000l));
+        fw.write(" " + (mtElapsed / 1000000l));
+        fw.write("\n");
+        fw.flush();
+        fw.close();
     }
 
 }
