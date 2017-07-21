@@ -1,0 +1,17 @@
+#Ignore file list
+.DS_Store
+
+#Eclipse
+.project
+.classpath
+.settings
+
+#Build
+lib/
+target/
+bin/
+
+#Edit
+*.*~
+.*.swp
+.*.swo
