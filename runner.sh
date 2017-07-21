@@ -19,8 +19,8 @@
 #
 #######################################################################
 #
-# Runs all the available test case scenarios defined in
-# scenarioX.properties files
+# Runs all the available test case scenario defined in
+# scenario.properties file
 #
 
 
@@ -79,7 +79,7 @@ fi
 tests_run=0
 shopt -s nullglob
 
-for test_props in scenario?.properties
+for test_props in scenario.properties
 do
     bench_scenario $test_props $1 $2 $3
     let "tests_run += 1"
@@ -89,7 +89,7 @@ if [ $tests_run -eq 0 ]
 then
     echo "No scenarios available to run."
     echo
-    echo "You can create a scenario by placing a scenarioX.properties file in the "
+    echo "You can create a scenario by placing a scenario.properties file in the "
     echo "current directory."
 else
     echo "Benchmarked $tests_run scenarios"
