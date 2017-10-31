@@ -13,9 +13,9 @@ It is licensed under the Apache 2 license.
 | Implementation      | Version          | Profile name      |
 |---------------------|------------------|-------------------|
 | Apache BVal         | `1.1.2`          | `bval`            |
-| Hibernate Validator | `5.4.1.Final`    | `hv-5.4`          |
-| Hibernate Validator | `6.0.0.CR3`      | `hv-6.0-stable`   |
-| Hibernate Validator | `6.0.0-SNAPSHOT` | `hv-6.0-snapshot` |
+| Hibernate Validator | `5.4.2.Final`    | `hv-5.4`          |
+| Hibernate Validator | `6.0.4.Final`    | `hv-6.0-stable`   |
+| Hibernate Validator | `6.0.5-SNAPSHOT` | `hv-6.0-snapshot` |
 
 ## Running a benchmark
 
@@ -43,13 +43,13 @@ times with the same beans.
 Now that you have created your scenario file, the `runner.sh` script at the root directory
 is your entry point to run the benchmark.
 
-Let's say you want to run a full benchmark for Hibernate Validator `5.4.1.Final`:
+Let's say you want to run a full benchmark for Hibernate Validator `5.4.2.Final`:
 
 ```
 ./runner.sh 1 hv-5.4
 ```
 
-The above command will run the benchmark once for the `hv-5` profile (see the available
+The above command will run the benchmark once for the `hv-5.4` profile (see the available
 profile names in the table above).
 
 

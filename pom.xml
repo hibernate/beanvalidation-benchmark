@@ -31,11 +31,11 @@
     
         <properties>
         <apache-bval.version>1.1.2</apache-bval.version>
-        <hibernate-validator-5.4.version>5.4.1.Final</hibernate-validator-5.4.version>
-        <hibernate-validator-6.0-stable.version>6.0.0.CR3</hibernate-validator-6.0-stable.version>
-        <hibernate-validator-6.0-snapshot.version>6.0.0-SNAPSHOT</hibernate-validator-6.0-snapshot.version>
+        <hibernate-validator-5.4.version>5.4.2.Final</hibernate-validator-5.4.version>
+        <hibernate-validator-6.0-stable.version>6.0.4.Final</hibernate-validator-6.0-stable.version>
+        <hibernate-validator-6.0-snapshot.version>6.0.5-SNAPSHOT</hibernate-validator-6.0-snapshot.version>
         <beanvalidation-1.1.version>1.1.0.Final</beanvalidation-1.1.version>
-        <beanvalidation-2.0.version>2.0.0.CR3</beanvalidation-2.0.version>
+        <beanvalidation-2.0.version>2.0.0.Final</beanvalidation-2.0.version>
 
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
@@ -104,9 +104,6 @@
         </profile>
         <profile>
             <id>bval</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <beanvalidation-impl.name>Apache BVal</beanvalidation-impl.name>
                 <beanvalidation-impl.short-name>bval</beanvalidation-impl.short-name>
@@ -167,6 +164,9 @@
         </profile>
         <profile>
             <id>hv-6.0-snapshot</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
                 <beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
                 <beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
