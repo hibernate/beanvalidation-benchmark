@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or
+    more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information regarding
+    copyright ownership. The ASF licenses this file to you under the
+    Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+    applicable law or agreed to in writing, software distributed
+    under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions
+    and limitations under the License.
+-->
+<!--
+    Maven release plugin requires the project tag to be on a single
+    line.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.hibernate.beanvalidation.benchmark</groupId>
+		<artifactId>beanvalidation-benchmark</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>jmh-benchmarks</artifactId>
+	<name>Bean Validation - JMH Benchmarks</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.hibernate.beanvalidation.benchmark</groupId>
+			<artifactId>bean-generator</artifactId>
+			<version>${project.version}</version>
+			<!--<type>test-jar</type>-->
+			<classifier>tests</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.openjdk.jmh</groupId>
+			<artifactId>jmh-generator-annprocess</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>bval</id>
+			<properties>
+				<beanvalidation-impl.name>Apache BVal</beanvalidation-impl.name>
+				<beanvalidation-impl.short-name>bval</beanvalidation-impl.short-name>
+				<beanvalidation-impl.version>${apache-bval.version}</beanvalidation-impl.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.bval</groupId>
+					<artifactId>org.apache.bval.bundle</artifactId>
+					<version>${apache-bval.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>javax.validation</groupId>
+					<artifactId>validation-api</artifactId>
+					<version>${beanvalidation-1.1.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>hv-5.4</id>
+			<properties>
+				<beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+				<beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+				<beanvalidation-impl.version>${hibernate-validator-5.4.version}</beanvalidation-impl.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-validator</artifactId>
+					<version>${hibernate-validator-5.4.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>javax.validation</groupId>
+					<artifactId>validation-api</artifactId>
+					<version>${beanvalidation-1.1.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>hv-6.0-stable</id>
+			<properties>
+				<beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+				<beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+				<beanvalidation-impl.version>${hibernate-validator-6.0-stable.version}</beanvalidation-impl.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.hibernate.validator</groupId>
+					<artifactId>hibernate-validator</artifactId>
+					<version>${hibernate-validator-6.0-stable.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>javax.validation</groupId>
+					<artifactId>validation-api</artifactId>
+					<version>${beanvalidation-2.0.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>hv-6.0-snapshot</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
+				<beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+				<beanvalidation-impl.version>${hibernate-validator-6.0-snapshot.version}</beanvalidation-impl.version>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.hibernate.validator</groupId>
+					<artifactId>hibernate-validator</artifactId>
+					<version>${hibernate-validator-6.0-snapshot.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>javax.validation</groupId>
+					<artifactId>validation-api</artifactId>
+					<version>${beanvalidation-2.0.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<!-- Create a runnable jar for JMH tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>bv-benchmarks-${beanvalidation-impl.version}</finalName>
+							<transformers>
+								<!-- Add a transformer to exclude any other manifest files (possibly from dependencies). -->
+								<transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+									<resource>MANIFEST.MF</resource>
+								</transformer>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>org.apache.bval.bench.BenchmarkRunner</mainClass>
+									<manifestEntries>
+										<Implementation-Title>${beanvalidation-impl.name}</Implementation-Title>
+										<Implementation-Version>${beanvalidation-impl.version}</Implementation-Version>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+							<filters>
+								<filter>
+									<!--
+                                        Shading signed JARs will fail without this.
+                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                                    -->
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
