@@ -30,7 +30,6 @@
     <name>Bean Validation - Benchmark</name>
 
     <modules>
-        <module>bean-generator</module>
         <module>jmh-benchmarks</module>
     </modules>
 
@@ -98,27 +97,10 @@
 
     <profiles>
         <profile>
-            <id>bv-1.1</id>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
-                    <version>${beanvalidation-1.1.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>bv-2.0</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
-                    <version>${beanvalidation-2.0.version}</version>
-                </dependency>
-            </dependencies>
+            <id>generate-beans</id>
+            <modules>
+                <module>bean-generator-bv-1.1</module>
+            </modules>
         </profile>
     </profiles>
 
