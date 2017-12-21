@@ -23,17 +23,35 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.hibernate.beanvalidation.benchmark</groupId>
-		<artifactId>beanvalidation-benchmark</artifactId>
-		<version>2.0.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-
+	<groupId>org.hibernate.beanvalidation.benchmark</groupId>
 	<artifactId>jmh-benchmarks</artifactId>
+	<version>2.0.0-SNAPSHOT</version>
+
 	<name>Bean Validation - JMH Benchmarks</name>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<!-- Bean validation provides and api versions -->
+		<apache-bval.version>1.1.2</apache-bval.version>
+		<hibernate-validator-5.4.version>5.4.2.Final</hibernate-validator-5.4.version>
+		<hibernate-validator-6.0-stable.version>6.0.7.Final</hibernate-validator-6.0-stable.version>
+		<hibernate-validator-6.0-snapshot.version>6.0.8-SNAPSHOT</hibernate-validator-6.0-snapshot.version>
+
+		<beanvalidation-1.1.version>1.1.0.Final</beanvalidation-1.1.version>
+		<beanvalidation-2.0.version>2.0.0.Final</beanvalidation-2.0.version>
+
+		<!-- Plugin versions -->
+		<maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+		<maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
+
+		<!-- Other dependencies versions -->
+		<jmh.version>1.19</jmh.version>
+
+	</properties>
+
 	<dependencies>
+		<!-- generated beans -->
 		<dependency>
 			<groupId>org.hibernate.beanvalidation.benchmark</groupId>
 			<artifactId>bean-generator-bv-1.1</artifactId>
@@ -46,20 +64,31 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<!--EL dependencies -->
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>3.0.1-b08</version>
+		</dependency>
+
+		<!-- JMH dependencies -->
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-core</artifactId>
+			<version>${jmh.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-generator-annprocess</artifactId>
+			<version>${jmh.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
 	<profiles>
 		<profile>
-			<id>bval1.1</id>
+			<id>bval-1.1</id>
 			<properties>
 				<beanvalidation-impl.name>Apache BVal</beanvalidation-impl.name>
 				<beanvalidation-impl.short-name>bval</beanvalidation-impl.short-name>
@@ -147,11 +176,17 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
 			</plugin>
 			<!-- Create a runnable jar for JMH tests -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
+				<version>${maven-shade-plugin.version}</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -175,10 +210,7 @@
 							</transformers>
 							<filters>
 								<filter>
-									<!--
-                                        Shading signed JARs will fail without this.
-                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
-                                    -->
+									<!-- Shading signed JARs will fail without this. http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar -->
 									<artifact>*:*</artifact>
 									<excludes>
 										<exclude>META-INF/*.SF</exclude>

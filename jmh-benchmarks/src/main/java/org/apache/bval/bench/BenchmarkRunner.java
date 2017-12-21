@@ -1,6 +1,5 @@
 package org.apache.bval.bench;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.apache.bval.bench.benchmarks.ParsingBeansSpeedBenchmark;
@@ -21,14 +20,16 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public final class BenchmarkRunner {
 
 	private static final Stream<? extends Class<?>> DEFAULT_TEST_CLASSES = Stream.of(
-			ParsingBeansSpeedBenchmark.class.getName(),
-			RawValidationSpeedBenchmark.class.getName()
-	).map( BenchmarkRunner::classForName ).filter( Objects::nonNull );
+			ParsingBeansSpeedBenchmark.class,
+			RawValidationSpeedBenchmark.class
+	);
 
 	private BenchmarkRunner() {
 	}
 
 	public static void main(String[] args) throws RunnerException, CommandLineOptionException {
+		Package currentPackage = Package.getPackage( "org.apache.bval.bench" );
+		System.out.println( currentPackage.getImplementationTitle() + " - " + currentPackage.getImplementationVersion() );
 		Options commandLineOptions = new CommandLineOptions( args );
 		ChainedOptionsBuilder builder = new OptionsBuilder().parent( commandLineOptions );
 
@@ -45,15 +46,4 @@ public final class BenchmarkRunner {
 		Options opt = builder.build();
 		new Runner( opt ).run();
 	}
-
-	private static Class<?> classForName(String qualifiedName) {
-		try {
-			return Class.forName( qualifiedName );
-		}
-		catch (ClassNotFoundException e) {
-			// silently ignore the error
-		}
-		return null;
-	}
-
 }
