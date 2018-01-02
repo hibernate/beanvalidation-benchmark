@@ -194,7 +194,7 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<finalName>bv-benchmarks-${beanvalidation-impl.version}</finalName>
+							<finalName>bv-benchmarks-${beanvalidation-impl.short-name}-${beanvalidation-impl.version}</finalName>
 							<transformers>
 								<!-- Add a transformer to exclude any other manifest files (possibly from dependencies). -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">

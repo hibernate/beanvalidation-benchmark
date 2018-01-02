@@ -66,8 +66,8 @@ mvn package -Phv-6.0-stable
 Finally, you can run the benchmarks as follows:
 
 ```bash
-java -jar target/bv-benchmarks-${snapshot-version}.jar
-java -jar target/bv-benchmarks-${stable-version}.jar
+java -jar target/bv-benchmarks-hv-${snapshot-version}.jar
+java -jar target/bv-benchmarks-hv-${stable-version}.jar
 popd
 ```
 
@@ -82,7 +82,7 @@ It is also possible to run a single benchmark if needed. To do so
 pass a benchmark test name from the above table as a parameter:
 
 ```bash
-java -jar target/bv-benchmarks-${impl-version}.jar RawValidationSpeedBenchmark
+java -jar target/bv-benchmarks-${impl}.jar RawValidationSpeedBenchmark
 ```
 
 ## Future
