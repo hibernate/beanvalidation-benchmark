@@ -14,8 +14,8 @@ It is licensed under the Apache 2 license.
 |---------------------|------------------|-------------------|
 | Apache BVal         | `1.1.2`          | `bval`            |
 | Hibernate Validator | `5.4.2.Final`    | `hv-5.4`          |
-| Hibernate Validator | `6.0.7.Final`    | `hv-6.0-stable`   |
-| Hibernate Validator | `6.0.8-SNAPSHOT` | `hv-6.0-snapshot` |
+| Hibernate Validator | `6.0.7.Final`    | `hv-6.0`          |
+| Hibernate Validator | `6.0.8-SNAPSHOT` | `hv-current`      |
 
 ## Generating the beans
 
@@ -59,15 +59,15 @@ Assuming root is the current location:
 
 ```bash
 pushd jmh-benchmarks
-mvn clean package -Phv-6.0-snapshot
-mvn package -Phv-6.0-stable
+mvn clean package -Phv-current
+mvn package -Phv-6.0
 ```
 
 Finally, you can run the benchmarks as follows:
 
 ```bash
-java -jar target/bv-benchmarks-hv-${snapshot-version}.jar
-java -jar target/bv-benchmarks-hv-${stable-version}.jar
+java -jar target/bv-benchmarks-hv-current.jar
+java -jar target/bv-benchmarks-hv-6.0.jar
 popd
 ```
 

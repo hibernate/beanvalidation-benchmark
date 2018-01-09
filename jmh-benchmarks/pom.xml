@@ -91,7 +91,7 @@
 			<id>bval-1.1</id>
 			<properties>
 				<beanvalidation-impl.name>Apache BVal</beanvalidation-impl.name>
-				<beanvalidation-impl.short-name>bval</beanvalidation-impl.short-name>
+				<beanvalidation-impl.short-name>bval-1.1</beanvalidation-impl.short-name>
 				<beanvalidation-impl.version>${apache-bval.version}</beanvalidation-impl.version>
 			</properties>
 			<dependencies>
@@ -111,7 +111,7 @@
 			<id>hv-5.4</id>
 			<properties>
 				<beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-				<beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+				<beanvalidation-impl.short-name>hv-5.4</beanvalidation-impl.short-name>
 				<beanvalidation-impl.version>${hibernate-validator-5.4.version}</beanvalidation-impl.version>
 			</properties>
 			<dependencies>
@@ -128,10 +128,10 @@
 			</dependencies>
 		</profile>
 		<profile>
-			<id>hv-6.0-stable</id>
+			<id>hv-6.0</id>
 			<properties>
 				<beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-				<beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+				<beanvalidation-impl.short-name>hv-6.0</beanvalidation-impl.short-name>
 				<beanvalidation-impl.version>${hibernate-validator-6.0-stable.version}</beanvalidation-impl.version>
 			</properties>
 			<dependencies>
@@ -148,13 +148,13 @@
 			</dependencies>
 		</profile>
 		<profile>
-			<id>hv-6.0-snapshot</id>
+			<id>hv-current</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
 				<beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
-				<beanvalidation-impl.short-name>hv</beanvalidation-impl.short-name>
+				<beanvalidation-impl.short-name>hv-current</beanvalidation-impl.short-name>
 				<beanvalidation-impl.version>${hibernate-validator-6.0-snapshot.version}</beanvalidation-impl.version>
 			</properties>
 			<dependencies>
@@ -194,7 +194,7 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<finalName>bv-benchmarks-${beanvalidation-impl.short-name}-${beanvalidation-impl.version}</finalName>
+							<finalName>bv-benchmarks-${beanvalidation-impl.short-name}</finalName>
 							<transformers>
 								<!-- Add a transformer to exclude any other manifest files (possibly from dependencies). -->
 								<transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
