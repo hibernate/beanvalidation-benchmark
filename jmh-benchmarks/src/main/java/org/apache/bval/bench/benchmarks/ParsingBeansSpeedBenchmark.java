@@ -56,13 +56,13 @@ public class ParsingBeansSpeedBenchmark {
 			holder = new Holder();
 		}
 
-		@Setup(Level.Iteration)
+		@Setup(Level.Invocation)
 		public void setup() {
 			validatorFactory = Validation.buildDefaultValidatorFactory();
 			validator = validatorFactory.getValidator();
 		}
 
-		@TearDown(Level.Iteration)
+		@TearDown(Level.Invocation)
 		public void teardown() {
 			validatorFactory.close();
 		}
@@ -71,11 +71,11 @@ public class ParsingBeansSpeedBenchmark {
 
 	@Benchmark
 	@BenchmarkMode(Mode.Throughput)
-	@OutputTimeUnit(TimeUnit.MILLISECONDS)
+	@OutputTimeUnit(TimeUnit.SECONDS)
 	@Fork(value = 1)
 	@Threads(1)
-	@Warmup(iterations = 5)
-	@Measurement(iterations = 20)
+	@Warmup(iterations = 5, time = 5, timeUnit = TimeUnit.SECONDS)
+	@Measurement(iterations = 10, time = 5, timeUnit = TimeUnit.SECONDS)
 	public void testCascadedValidation(ParsingBeansSpeedState state, Blackhole bh) {
 		// Validator in new factory
 
