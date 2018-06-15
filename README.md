@@ -14,8 +14,8 @@ It is licensed under the Apache 2 license.
 |---------------------|------------------|-------------------|
 | Apache BVal         | `1.1.2`          | `bval`            |
 | Hibernate Validator | `5.4.2.Final`    | `hv-5.4`          |
-| Hibernate Validator | `6.0.7.Final`    | `hv-6.0`          |
-| Hibernate Validator | `6.0.8-SNAPSHOT` | `hv-current`      |
+| Hibernate Validator | `6.0.10.Final`   | `hv-6.0`          |
+| Hibernate Validator | `6.1.0-SNAPSHOT` | `hv-current`      |
 
 ## Generating the beans
 

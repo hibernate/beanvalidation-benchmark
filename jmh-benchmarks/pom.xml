@@ -35,19 +35,18 @@
 		<!-- Bean validation provides and api versions -->
 		<apache-bval.version>1.1.2</apache-bval.version>
 		<hibernate-validator-5.4.version>5.4.2.Final</hibernate-validator-5.4.version>
-		<hibernate-validator-6.0-stable.version>6.0.7.Final</hibernate-validator-6.0-stable.version>
-		<hibernate-validator-6.0-snapshot.version>6.0.8-SNAPSHOT</hibernate-validator-6.0-snapshot.version>
+		<hibernate-validator-6.0-stable.version>6.0.10.Final</hibernate-validator-6.0-stable.version>
+		<hibernate-validator-6.1-snapshot.version>6.1.0-SNAPSHOT</hibernate-validator-6.1-snapshot.version>
 
 		<beanvalidation-1.1.version>1.1.0.Final</beanvalidation-1.1.version>
-		<beanvalidation-2.0.version>2.0.0.Final</beanvalidation-2.0.version>
+		<beanvalidation-2.0.version>2.0.1.Final</beanvalidation-2.0.version>
 
 		<!-- Plugin versions -->
-		<maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-		<maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
+		<maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+		<maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
 
 		<!-- Other dependencies versions -->
-		<jmh.version>1.19</jmh.version>
-
+		<jmh.version>1.21</jmh.version>
 	</properties>
 
 	<dependencies>
@@ -69,7 +68,7 @@
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.el</artifactId>
-			<version>3.0.1-b08</version>
+			<version>3.0.1-b09</version>
 		</dependency>
 
 		<!-- JMH dependencies -->
@@ -155,13 +154,13 @@
 			<properties>
 				<beanvalidation-impl.name>Hibernate Validator</beanvalidation-impl.name>
 				<beanvalidation-impl.short-name>hv-current</beanvalidation-impl.short-name>
-				<beanvalidation-impl.version>${hibernate-validator-6.0-snapshot.version}</beanvalidation-impl.version>
+				<beanvalidation-impl.version>${hibernate-validator-6.1-snapshot.version}</beanvalidation-impl.version>
 			</properties>
 			<dependencies>
 				<dependency>
 					<groupId>org.hibernate.validator</groupId>
 					<artifactId>hibernate-validator</artifactId>
-					<version>${hibernate-validator-6.0-snapshot.version}</version>
+					<version>${hibernate-validator-6.1-snapshot.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>javax.validation</groupId>
