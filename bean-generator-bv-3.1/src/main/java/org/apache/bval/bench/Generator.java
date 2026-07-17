@@ -20,7 +20,6 @@ package org.apache.bval.bench;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.bval.bench.jsr303.Jsr303Annotator;
@@ -30,16 +29,17 @@ import org.apache.bval.bench.metatree.JavaBeanRefField;
 import org.apache.bval.bench.metatree.MetaJavaBean;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.sun.codemodel.JBlock;
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JVar;
+import com.helger.jcodemodel.AbstractJClass;
+import com.helger.jcodemodel.JBlock;
+import com.helger.jcodemodel.JCodeModel;
+import com.helger.jcodemodel.JDefinedClass;
+import com.helger.jcodemodel.JExpr;
+import com.helger.jcodemodel.JFieldVar;
+import com.helger.jcodemodel.JMethod;
+import com.helger.jcodemodel.JMod;
+import com.helger.jcodemodel.JVar;
+import com.helger.jcodemodel.exceptions.JCodeModelException;
+import com.helger.jcodemodel.writer.JCMWriter;
 
 
 /**
@@ -167,7 +167,7 @@ public class Generator {
         try {
             // Generate the holder class
             JDefinedClass holderClass = cm._class(Config.CFG.getBasePackageName() + ".Holder");
-            JClass alObject = (JClass) cm._ref(ArrayList.class);
+            AbstractJClass alObject = cm.ref(ArrayList.class);
             alObject = alObject.narrow(Object.class);
             JFieldVar beansField = holderClass.field(JMod.PUBLIC, alObject, "beans", JExpr._new(alObject));
             JMethod defConstructor = holderClass.constructor(JMod.PUBLIC);
@@ -185,7 +185,7 @@ public class Generator {
                 bmjb.generateStaticInitCode();
             }
 
-        } catch (JClassAlreadyExistsException e) {
+        } catch (JCodeModelException e) {
             throw new RuntimeException("Error generating the holder class.", e);
         }
     }
@@ -199,7 +199,7 @@ public class Generator {
         try {
             File file = new File(Config.CFG.getOutputDir());
             file.mkdirs();
-            cm.build(file, (PrintStream) null);
+            new JCMWriter(cm).build(file);
         } catch (IOException e) {
             throw new RuntimeException("Error generating the java files", e);
         }

@@ -188,6 +188,10 @@ public enum Config {
     public boolean shouldInherit() {
         return r.nextDouble() < new Double(p.getProperty("generator.inheritanceratio"));
     }
+
+    public boolean shouldUseTypeUseConstraint() {
+        return r.nextDouble() < new Double(p.getProperty("generator.typeuse.ratio"));
+    }
     
     /**
      * Prints in {@link System.out} the generator properties.

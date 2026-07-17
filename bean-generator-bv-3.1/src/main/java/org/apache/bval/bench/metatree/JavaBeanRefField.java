@@ -18,71 +18,127 @@
  */
 package org.apache.bval.bench.metatree;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import jakarta.validation.Valid;
+import org.apache.bval.bench.Config;
 import org.apache.bval.bench.Util;
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JBlock;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
-import com.sun.codemodel.JVar;
+import com.helger.jcodemodel.AbstractJClass;
+import com.helger.jcodemodel.JAnnotationUse;
+import com.helger.jcodemodel.JBlock;
+import com.helger.jcodemodel.JCodeModel;
+import com.helger.jcodemodel.JDefinedClass;
+import com.helger.jcodemodel.JExpr;
+import com.helger.jcodemodel.JMethod;
+import com.helger.jcodemodel.JMod;
+import com.helger.jcodemodel.JVar;
 
 
 /**
  * A field with getter/setter methods that references another bean.
- * 
+ *
  * @author Carlos Vara
  */
 public class JavaBeanRefField extends AbstractMetaField implements Annotable {
 
-    // Referenced bean
+    private static final List<Class<?>> CONTAINER_TYPES = List.of(List.class, Set.class, Optional.class);
+
     private final MetaJavaBean refBean;
-    
+    private final boolean typeUse;
+    private final JCodeModel cm;
+    private AbstractJClass containerClass;
+
     private JMethod getter;
     private JMethod setter;
-    
-    public JavaBeanRefField(MetaJavaBean owner, String name, MetaJavaBean refBean) {
+
+    private final List<MetaAnnotation> accumulatedTypeUseAnnotations = new ArrayList<>();
+
+    public JavaBeanRefField(MetaJavaBean owner, String name, MetaJavaBean refBean, JCodeModel cm, boolean typeUse) {
         super(owner, name);
-        
+
         this.refBean = refBean;
-        
-        // Generate the field declaration
+        this.cm = cm;
+        this.typeUse = typeUse;
+
         JDefinedClass ownerClass = owner.getGeneratedClass();
-        this.generatedField = ownerClass.field(JMod.PRIVATE, refBean.getGeneratedClass(), name);
-        
-        // The getter
-        getter = ownerClass.method(JMod.PUBLIC, refBean.getGeneratedClass(), "get"+name.substring(0, 1).toUpperCase()+name.substring(1));
+        String getterName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+        String setterName = "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+
+        if (typeUse) {
+            Class<?> containerType = Config.CFG.getRandom(CONTAINER_TYPES);
+            this.containerClass = cm.ref(containerType);
+            AbstractJClass fieldType = containerClass.narrow(refBean.getGeneratedClass());
+            this.generatedField = ownerClass.field(JMod.PRIVATE, fieldType, name);
+            getter = ownerClass.method(JMod.PUBLIC, fieldType, getterName);
+            setter = ownerClass.method(JMod.PUBLIC, void.class, setterName);
+            setter.param(fieldType, name);
+        } else {
+            this.generatedField = ownerClass.field(JMod.PRIVATE, refBean.getGeneratedClass(), name);
+            getter = ownerClass.method(JMod.PUBLIC, refBean.getGeneratedClass(), getterName);
+            setter = ownerClass.method(JMod.PUBLIC, void.class, setterName);
+            setter.param(refBean.getGeneratedClass(), name);
+        }
         getter.body()._return(this.generatedField);
-        
-        // The setter
-        setter = ownerClass.method(JMod.PUBLIC, void.class, "set"+name.substring(0, 1).toUpperCase()+name.substring(1));
-        JVar setterParam = setter.param(refBean.getGeneratedClass(), name);
-        setter.body().assign(JExpr._this().ref(this.generatedField), setterParam);
+        setter.body().assign(JExpr._this().ref(this.generatedField), setter.params().get(0));
     }
 
     @Override
     public void accept(AnnotatorVisitor annotator) {
         annotator.annotate(this);
     }
-    
+
     @Override
     public void addAnnotation(MetaAnnotation annot) {
-        // Add the annotation to the set of annotations
-        if ( this.annotations.add(annot) ) {
-            // Generate the source
-            JAnnotationUse genAnnot = getter.annotate(annot.getAnnotationClass());
-            for (String paramKey : annot.getParameters().keySet()) {
-                Util.addAnnotParam(genAnnot, paramKey, annot.getParameters().get(paramKey));
+        if (this.annotations.add(annot)) {
+            if (typeUse && annot.getAnnotationClass().equals(cm.ref(Valid.class))) {
+                accumulatedTypeUseAnnotations.add(annot);
+            } else {
+                JAnnotationUse genAnnot = getter.annotate(annot.getAnnotationClass());
+                for (String paramKey : annot.getParameters().keySet()) {
+                    Util.addAnnotParam(genAnnot, paramKey, annot.getParameters().get(paramKey));
+                }
             }
         }
-    }    
-    
+    }
+
+    public void finalizeTypeUseAnnotations() {
+        if (!typeUse || accumulatedTypeUseAnnotations.isEmpty()) {
+            return;
+        }
+
+        AbstractJClass elementType = refBean.getGeneratedClass();
+
+        for (MetaAnnotation annot : accumulatedTypeUseAnnotations) {
+            JAnnotationUse annotUse = new JAnnotationUse(annot.getAnnotationClass());
+            for (String paramKey : annot.getParameters().keySet()) {
+                Util.addAnnotParam(annotUse, paramKey, annot.getParameters().get(paramKey));
+            }
+            elementType = elementType.annotated(annotUse);
+        }
+
+        AbstractJClass annotatedType = containerClass.narrow(elementType);
+
+        generatedField.type(annotatedType);
+        getter.type(annotatedType);
+        setter.params().get(0).type(annotatedType);
+    }
+
+    public boolean isTypeUse() {
+        return typeUse;
+    }
+
     public void generateAssignCode(JBlock body, JVar var, JVar value) {
-        body.add(var.invoke(this.setter).arg(value));
+        if (typeUse) {
+            body.add(var.invoke(this.setter).arg(containerClass.staticInvoke("of").arg(value)));
+        } else {
+            body.add(var.invoke(this.setter).arg(value));
+        }
     }
 
     public MetaJavaBean getRefBean() {
         return refBean;
     }
-    
+
 }

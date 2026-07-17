@@ -23,3 +23,13 @@ bin/
 # Scenario files
 scenario.properties
 src/main/resources/generator.properties
+
+# Benchmark artifacts
+scripts/.results/
+scripts/.async-profiler/
+
+# JVM crash dumps
+core.*.dmp
+javacore.*.txt
+Snap.*.trc
+jitdump.*.dmp

@@ -32,11 +32,18 @@ import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import jakarta.validation.ReportAsSingleViolation;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Negative;
+import jakarta.validation.constraints.NegativeOrZero;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import org.apache.bval.bench.Config;
 import org.apache.bval.bench.metatree.AbstractMetaField;
@@ -52,15 +59,15 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.sun.codemodel.ClassType;
-import com.sun.codemodel.JAnnotationArrayMember;
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JMod;
+import com.helger.jcodemodel.AbstractJClass;
+import com.helger.jcodemodel.EClassType;
+import com.helger.jcodemodel.JAnnotationArrayMember;
+import com.helger.jcodemodel.JCodeModel;
+import com.helger.jcodemodel.JDefinedClass;
+import com.helger.jcodemodel.JExpr;
+import com.helger.jcodemodel.JMethod;
+import com.helger.jcodemodel.JMod;
+import com.helger.jcodemodel.exceptions.JCodeModelException;
 
 
 /**
@@ -138,8 +145,12 @@ public class Jsr303Annotator implements AnnotatorVisitor {
             jbrf.getOwner().addGroup(group);
             annotCopy.setGroup(group);
         }
-        
+
         jbrf.addAnnotation(annotCopy);
+
+        if (jbrf.isTypeUse()) {
+            jbrf.finalizeTypeUseAnnotations();
+        }
     }
 
     @Override
@@ -164,6 +175,10 @@ public class Jsr303Annotator implements AnnotatorVisitor {
 
         jbbf.setValidValues(mas.getValidValues());
         jbbf.setInvalidValues(mas.getInvalidValues());
+
+        if (jbbf.isTypeUse()) {
+            jbbf.finalizeTypeUseAnnotations();
+        }
     }
 
     
@@ -227,7 +242,27 @@ public class Jsr303Annotator implements AnnotatorVisitor {
         annotationsSet.add(new MetaAnnotation(goodCode, AnnotationType.JSR_303, annotParams));
         anns.put(BasicType.STRING, new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) "goodcode", "1234123"), Lists.newArrayList((Object) null, "bad", "acodetoolong")));
 
-        
+        // ### STRING - BV 2.0 constraints ------------------------------------
+
+        // @NotBlank / "good" / [ "", "   " ]
+        annotationsSet = Sets.newHashSet();
+        annotParams = Maps.newHashMap();
+        annotationsSet.add(new MetaAnnotation(codeModel, NotBlank.class, AnnotationType.JSR_303, annotParams));
+        anns.put(BasicType.STRING, new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) "good"), Lists.newArrayList((Object) "", "   ")));
+
+        // @NotEmpty / "good" / [ "" ]
+        annotationsSet = Sets.newHashSet();
+        annotParams = Maps.newHashMap();
+        annotationsSet.add(new MetaAnnotation(codeModel, NotEmpty.class, AnnotationType.JSR_303, annotParams));
+        anns.put(BasicType.STRING, new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) "good"), Lists.newArrayList((Object) "")));
+
+        // @Email / "test@example.com" / [ "notanemail" ]
+        annotationsSet = Sets.newHashSet();
+        annotParams = Maps.newHashMap();
+        annotationsSet.add(new MetaAnnotation(codeModel, Email.class, AnnotationType.JSR_303, annotParams));
+        anns.put(BasicType.STRING, new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) "test@example.com"), Lists.newArrayList((Object) "notanemail")));
+
+
         // ### INTEGER & INT ---------------------------------------------------
 
         // @NotNull / 3 / null
@@ -268,9 +303,48 @@ public class Jsr303Annotator implements AnnotatorVisitor {
         maSet.getInvalidValues().remove(null);
         anns.put(BasicType.INT, maSet);
 
+        // ### INTEGER & INT - BV 2.0 constraints -----------------------------
+
+        // @Positive / [ 5, 100 ] / [ 0, -1 ]
+        annotationsSet = Sets.newHashSet();
+        annotParams = Maps.newHashMap();
+        annotationsSet.add(new MetaAnnotation(codeModel, Positive.class, AnnotationType.JSR_303, annotParams));
+        maSet = new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) 5, 100), Lists.newArrayList((Object) 0, -1));
+        anns.put(BasicType.INTEGER, maSet);
+        anns.put(BasicType.INT, maSet);
+
+        // @PositiveOrZero / [ 0, 5 ] / [ -1, -100 ]
+        annotationsSet = Sets.newHashSet();
+        annotParams = Maps.newHashMap();
+        annotationsSet.add(new MetaAnnotation(codeModel, PositiveOrZero.class, AnnotationType.JSR_303, annotParams));
+        maSet = new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) 0, 5), Lists.newArrayList((Object) (-1), -100));
+        anns.put(BasicType.INTEGER, maSet);
+        anns.put(BasicType.INT, maSet);
+
+        // @Negative / [ -5, -100 ] / [ 0, 1 ]
+        annotationsSet = Sets.newHashSet();
+        annotParams = Maps.newHashMap();
+        annotationsSet.add(new MetaAnnotation(codeModel, Negative.class, AnnotationType.JSR_303, annotParams));
+        maSet = new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) (-5), -100), Lists.newArrayList((Object) 0, 1));
+        anns.put(BasicType.INTEGER, maSet);
+        anns.put(BasicType.INT, maSet);
+
+        // @NegativeOrZero / [ 0, -5 ] / [ 1, 100 ]
+        annotationsSet = Sets.newHashSet();
+        annotParams = Maps.newHashMap();
+        annotationsSet.add(new MetaAnnotation(codeModel, NegativeOrZero.class, AnnotationType.JSR_303, annotParams));
+        maSet = new Jsr303MetaAnnotationSet(annotationsSet, Lists.newArrayList((Object) 0, -5), Lists.newArrayList((Object) 1, 100));
+        anns.put(BasicType.INTEGER, maSet);
+        anns.put(BasicType.INT, maSet);
+
+        // Collection types reuse their element type's annotation sets
+        anns.putAll(BasicType.LIST_OF_STRING, anns.get(BasicType.STRING));
+        anns.putAll(BasicType.OPTIONAL_STRING, anns.get(BasicType.STRING));
+        anns.putAll(BasicType.SET_OF_INTEGER, anns.get(BasicType.INTEGER));
+
         return anns;
     }
-    
+
     /**
      * @return The list of constraints for fields that reference other beans.
      */
@@ -320,35 +394,35 @@ public class Jsr303Annotator implements AnnotatorVisitor {
 
     private JDefinedClass buildTemplateConstraint(String name) {
         try {
-            JDefinedClass tplConstraint = codeModel._class(Config.CFG.getBasePackageName() + ".annot."+name, ClassType.ANNOTATION_TYPE_DECL);
+            JDefinedClass tplConstraint = codeModel._class(Config.CFG.getBasePackageName() + ".annot."+name, EClassType.ANNOTATION_TYPE_DECL);
             tplConstraint.annotate(Documented.class);
             tplConstraint.annotate(Retention.class).param("value", RetentionPolicy.RUNTIME);
-            tplConstraint.annotate(Target.class).paramArray("value").param(ElementType.TYPE).param(ElementType.ANNOTATION_TYPE).param(ElementType.FIELD).param(ElementType.METHOD);
+            tplConstraint.annotate(Target.class).paramArray("value").param(ElementType.TYPE).param(ElementType.ANNOTATION_TYPE).param(ElementType.FIELD).param(ElementType.METHOD).param(ElementType.TYPE_USE);
             
             // Using direct as I don't know how to build default { } with code model
             tplConstraint.direct("\n" + "    Class<?>[] groups() default {};\n" + "    String message() default \"Invalid value\";\n" + "    Class<? extends Payload>[] payload() default {};\n");
             
             // Hack to force the import of jakarta.validation.Payload
-            tplConstraint.javadoc().addThrows((JClass) codeModel._ref(Payload.class)).add("Force import");
+            tplConstraint.javadoc().addThrows(codeModel.ref(Payload.class)).add("Force import");
             
             return tplConstraint;
-        } catch (JClassAlreadyExistsException e) {
+        } catch (JCodeModelException e) {
             throw new RuntimeException("Tried to create an already existing class: " + name, e);
         }
     }
     
     private JDefinedClass buildTemplateConstraintValidator(String name, JDefinedClass constraint, Class<?> param) {
         try {
-            JClass cv = (JClass) codeModel._ref(ConstraintValidator.class);
-            cv = cv.narrow(constraint, (JClass) codeModel._ref(param));
-            JDefinedClass validator = constraint._class(JMod.STATIC | JMod.PUBLIC, name);
+            AbstractJClass cv = codeModel.ref(ConstraintValidator.class);
+            cv = cv.narrow(constraint, codeModel.ref(param));
+            JDefinedClass validator = codeModel._class(JMod.PUBLIC, Config.CFG.getBasePackageName() + ".annot." + name, EClassType.CLASS);
             validator._implements(cv);
             validator.method(JMod.PUBLIC, void.class, "initialize").param(constraint, "parameters");
             JMethod isValid = validator.method(JMod.PUBLIC, boolean.class, "isValid");
             isValid.param(Object.class, "value");
             isValid.param(ConstraintValidatorContext.class, "context");
             return validator;
-        } catch (JClassAlreadyExistsException e) {
+        } catch (JCodeModelException e) {
             throw new RuntimeException("Tried to create an already existing class: " + name, e);
         }
     }

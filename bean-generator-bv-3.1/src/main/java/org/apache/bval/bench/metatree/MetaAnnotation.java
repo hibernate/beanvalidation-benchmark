@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.bval.bench.jsr303.MetaGroup;
 import com.google.common.collect.Maps;
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.JDefinedClass;
+import com.helger.jcodemodel.AbstractJClass;
+import com.helger.jcodemodel.JCodeModel;
+import com.helger.jcodemodel.JDefinedClass;
 
 
 /**
@@ -39,14 +39,14 @@ public class MetaAnnotation {
     private final AnnotationType annotationType;
 
     // The class of the annotation, which is what it defines its equals()
-    private JClass annotationJClass;
+    private AbstractJClass annotationJClass;
 
     // A HashMap of the attributes
     private Map<String, Object> parameters;
 
 
     public MetaAnnotation(JCodeModel cm, Class<? extends Annotation> annotationClass, AnnotationType annotationType, Map<String, Object> parameters) {
-        this.annotationJClass = (JClass) cm._ref(annotationClass);
+        this.annotationJClass = cm.ref(annotationClass);
         this.annotationType = annotationType;
         this.parameters = parameters;
     }
@@ -63,7 +63,7 @@ public class MetaAnnotation {
         this.parameters = Maps.newHashMap(src.parameters);
     }
 
-    public JClass getAnnotationClass() {
+    public AbstractJClass getAnnotationClass() {
         return annotationJClass;
     }
 

@@ -20,7 +20,7 @@ package org.apache.bval.bench.metatree;
 
 import java.util.Set;
 import com.google.common.collect.Sets;
-import com.sun.codemodel.JFieldVar;
+import com.helger.jcodemodel.JFieldVar;
 
 
 /**
