@@ -29,11 +29,11 @@ import org.apache.bval.bench.Util;
 import org.apache.bval.bench.jsr303.MetaGroup;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.sun.codemodel.ClassType;
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JMod;
+import com.helger.jcodemodel.EClassType;
+import com.helger.jcodemodel.JAnnotationUse;
+import com.helger.jcodemodel.JCodeModel;
+import com.helger.jcodemodel.JDefinedClass;
+import com.helger.jcodemodel.JMod;
 
 
 /**
@@ -67,7 +67,7 @@ public class MetaJavaBean extends AbstractBaseMetaClass implements Annotable {
      */
     public MetaJavaBean(JCodeModel cm, String fqn, int numFields) {
 
-        super(cm, fqn, ClassType.CLASS);
+        super(cm, fqn, EClassType.CLASS);
 
         // Empty constructor
         getGeneratedClass().constructor(JMod.PUBLIC);
@@ -76,7 +76,7 @@ public class MetaJavaBean extends AbstractBaseMetaClass implements Annotable {
         this.fields = Maps.newHashMapWithExpectedSize(numFields);
         for (int i = 0; i < numFields; ++i) {
             String fieldName = "field" + Config.CFG.nextUniqueNum();
-            JavaBeanBasicField field = new JavaBeanBasicField(this, fieldName);
+            JavaBeanBasicField field = new JavaBeanBasicField(this, fieldName, cm, Config.CFG.shouldUseTypeUseConstraint());
             fields.put(fieldName, field);
         }
 
@@ -91,10 +91,11 @@ public class MetaJavaBean extends AbstractBaseMetaClass implements Annotable {
     public void interrelate(List<MetaJavaBean> beans) {
 
         final int numInterrelations = Config.CFG.rndNumInterrelations();
+        JCodeModel cm = getGeneratedClass().owner();
 
         for (int i = 0; i < numInterrelations; ++i) {
             String fieldName = "beanRef" + i;
-            JavaBeanRefField field = new JavaBeanRefField(this, fieldName, Config.CFG.getRandom(beans));
+            JavaBeanRefField field = new JavaBeanRefField(this, fieldName, Config.CFG.getRandom(beans), cm, Config.CFG.shouldUseTypeUseConstraint());
             fields.put(fieldName, field);
         }
     }

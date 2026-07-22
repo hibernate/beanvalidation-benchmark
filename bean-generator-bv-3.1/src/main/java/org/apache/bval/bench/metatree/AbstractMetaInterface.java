@@ -18,8 +18,8 @@
  */
 package org.apache.bval.bench.metatree;
 
-import com.sun.codemodel.ClassType;
-import com.sun.codemodel.JCodeModel;
+import com.helger.jcodemodel.EClassType;
+import com.helger.jcodemodel.JCodeModel;
 
 
 /**
@@ -30,7 +30,7 @@ import com.sun.codemodel.JCodeModel;
 public abstract class AbstractMetaInterface extends AbstractBaseMetaClass {
 
     public AbstractMetaInterface(JCodeModel cm, String fqn) {
-        super(cm, fqn, ClassType.INTERFACE);
+        super(cm, fqn, EClassType.INTERFACE);
     }
 
 }

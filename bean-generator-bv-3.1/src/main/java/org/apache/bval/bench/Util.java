@@ -18,11 +18,12 @@
  */
 package org.apache.bval.bench;
 
-import com.sun.codemodel.JAnnotationArrayMember;
-import com.sun.codemodel.JAnnotationUse;
-import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JExpression;
-import com.sun.codemodel.JType;
+import com.helger.jcodemodel.AbstractJClass;
+import com.helger.jcodemodel.AbstractJType;
+import com.helger.jcodemodel.IJExpression;
+import com.helger.jcodemodel.JAnnotationArrayMember;
+import com.helger.jcodemodel.JAnnotationUse;
+import com.helger.jcodemodel.JExpr;
 
 
 /**
@@ -44,7 +45,7 @@ public final class Util {
      *            The literal value that must be output in an expresion.
      * @return The matching expression for the real type of value.
      */
-    public static JExpression literalExpr(Object value) {
+    public static IJExpression literalExpr(Object value) {
         if (value == null) {
             return JExpr._null();
         } else if (value instanceof String) {
@@ -79,8 +80,8 @@ public final class Util {
             annot.param(key, (String) value);
         } else if (value instanceof Class<?>) {
             annot.param(key, (Class<?>) value);
-        } else if (value instanceof JType) {
-            annot.param(key, (JType) value);
+        } else if (value instanceof AbstractJType) {
+            annot.param(key, (AbstractJType) value);
         } else if (value.getClass().isArray()) {
             Object[] valueArr = (Object[]) value;
             JAnnotationArrayMember aux = annot.paramArray(key);
@@ -92,10 +93,17 @@ public final class Util {
         }
     }
 
+    public static IJExpression collectionLiteralExpr(AbstractJClass containerClass, Object value) {
+        if (value == null) {
+            return JExpr._null();
+        }
+        return containerClass.staticInvoke("of").arg(literalExpr(value));
+    }
+
     private static void addAnnotArrayParam(JAnnotationArrayMember aux, Object value) {
-        if (value instanceof JType) {
-            aux.param((JType) value);
-            // return aux.param((JType)value); ?? No Javadoc defining how to use the API
+        if (value instanceof AbstractJType) {
+            aux.param((AbstractJType) value);
+            // return aux.param((AbstractJType)value); ?? No Javadoc defining how to use the API
         } else {
             throw new RuntimeException("Impossible to construct annotation param array for: " + value);
         }

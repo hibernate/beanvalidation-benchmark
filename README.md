@@ -10,15 +10,35 @@ It is licensed under the Apache 2 license.
 
 ## Implementations available
 
-| Implementation      | Version          | Profile name |
-|---------------------|------------------|--------------|
-| Apache BVal         | `1.1.2`          | `bval-1.1`   |
-| Apache BVal         | `3.0.2`          | `bval-3.0`   |
-| Hibernate Validator | `5.4.2.Final`    | `hv-5.4`     |
-| Hibernate Validator | `6.0.10.Final`   | `hv-6.0`     |
-| Hibernate Validator | `9.0.1.Final`    | `hv-9.0`     |
-| Hibernate Validator | `9.1.0.Alpha1`   | `hv-9.1`     |
-| Hibernate Validator | `9.1.0-SNAPSHOT` | `hv-current` |
+| Implementation      | Version          | Profile name | Bean Generator |
+|---------------------|------------------|--------------|----------------|
+| Apache BVal         | `1.1.2`          | `bval-1.1`   | `bv-1.1`       |
+| Apache BVal         | `3.0.2`          | `bval-3.0`   | `bv-3.1`       |
+| Hibernate Validator | `5.4.2.Final`    | `hv-5.4`     | `bv-1.1`       |
+| Hibernate Validator | `6.0.10.Final`   | `hv-6.0`     | `bv-1.1`       |
+| Hibernate Validator | `9.0.1.Final`    | `hv-9.0`     | `bv-3.1`       |
+| Hibernate Validator | `9.1.0.Alpha1`   | `hv-9.1`     | `bv-3.1`       |
+| Hibernate Validator | `9.1.0-SNAPSHOT` | `hv-current` | `bv-3.1`       |
+
+## Bean generators
+
+### `bean-generator-bv-1.1`
+
+Generates beans using Bean Validation 1.1 features only (`javax.validation`):
+
+- Constraints: `@NotNull`, `@Size`, `@Min`, `@Max`, `@Pattern`, `@Null`
+- Composed constraints: `@GoodCode`, `@RangedInt`, `@AlwaysValid`
+- `@Valid` on reference fields
+
+### `bean-generator-bv-3.1`
+
+Generates beans using Bean Validation 2.0+ features (`jakarta.validation`):
+
+- All BV 1.1 constraints plus BV 2.0 additions: `@NotBlank`, `@NotEmpty`, `@Email`, `@Positive`, `@PositiveOrZero`, `@Negative`, `@NegativeOrZero`
+- Container element validation: basic fields can be `List<@NotNull String>`, `Set<@Size(...) Integer>`, `Optional<@Email String>`
+- Container element `@Valid`: reference fields can be `List<@Valid Bean>`, `Set<@Valid Bean>`, `Optional<@Valid Bean>`
+- `@Valid` is placed on container elements (type-use), not on the container getter
+- Type-use constraint ratio is configurable via `generator.typeuse.ratio` (default: 30%)
 
 ## Generating the beans
 
@@ -88,10 +108,69 @@ pass a benchmark test name from the above table as a parameter:
 java -jar target/bv-benchmarks-${impl}.jar RawValidationSpeedBenchmark
 ```
 
-## Future
+## Running benchmarks with the script
 
-For now, our benchmarks only tests the Bean Validation 1.1 features.
-The Jakarta 3.1 generator is identical to the 1.1 one with the difference in the packages (jakarta vs javax)
+A convenience script (`scripts/run-benchmarks.sh`) automates the full workflow:
+building the bean generator, packaging the JMH benchmark JARs, and running the benchmarks.
+Results are saved to timestamped directories under `scripts/.results/`.
 
-It would be also good to have another bean-generator with beans using Bean Validation 2.0
-features and some benchmarks for it.
+### Prerequisites
+
+- Java 17+ on `PATH`
+- Maven on `PATH`
+
+### Quick start
+
+```bash
+# Run all benchmarks with the default profile (hv-current).
+# This will build the bean generator, package the benchmark JAR, and run it.
+./scripts/run-benchmarks.sh
+
+# Quick dev run (1 fork, 3 warmup, 5 measurement, 1 thread)
+./scripts/run-benchmarks.sh --quick --profile hv-9.0
+```
+
+### Options
+
+| Option                   | Description                                                      |
+|--------------------------|------------------------------------------------------------------|
+| `--profile <name>`       | Implementation profile to benchmark (repeatable). Default: `hv-current`. Valid: `hv-current`, `hv-9.1`, `hv-9.0`, `hv-6.0`, `hv-5.4`, `bval-3.0`, `bval-1.1` |
+| `--skip-build`           | Skip Maven builds and reuse existing JARs                        |
+| `--quick`                | Quick mode: 1 fork, 3 warmup, 5 measurement, 1 thread           |
+| `--forks <N>`            | Number of JMH forks                                              |
+| `--warmup <N>`           | Number of warmup iterations                                      |
+| `--measurement <N>`      | Number of measurement iterations                                 |
+| `--threads <N>`          | Number of threads                                                |
+| `--jvm-args "<args>"`    | Extra JVM arguments passed to benchmark forks                    |
+| `-h`, `--help`           | Show help                                                        |
+
+Any positional arguments are treated as JMH benchmark name patterns (e.g. `RawValidationSpeedBenchmark`).
+
+### Examples
+
+```bash
+# Run a single benchmark
+./scripts/run-benchmarks.sh --quick --profile hv-9.0 RawValidationSpeedBenchmark
+
+# Compare two implementations side by side
+./scripts/run-benchmarks.sh --profile hv-9.0 --profile hv-9.1
+
+# Skip rebuilding if the beans and JARs are already in place
+./scripts/run-benchmarks.sh --skip-build --profile hv-9.0
+
+# Custom JMH parameters
+./scripts/run-benchmarks.sh --forks 2 --warmup 5 --measurement 10 --threads 4
+
+# Custom JVM arguments
+./scripts/run-benchmarks.sh --quick --jvm-args "-XX:+UseG1GC -Xmx2g"
+```
+
+### Output
+
+Each run creates a timestamped directory under `scripts/.results/` (gitignored) containing:
+
+- `environment.txt` — profile, date, Java version, OS, JMH arguments
+- `jmh-results.json` — structured JMH results
+- `output.log` — full console output
+
+When comparing multiple profiles, each gets its own subdirectory within the same timestamped run.

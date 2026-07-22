@@ -42,15 +42,15 @@
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 
 		<!--dependency versions-->
-		<codemodel.version>2.2</codemodel.version>
+		<jcodemodel.version>4.2.1</jcodemodel.version>
 		<google-collections.version>1.0</google-collections.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.sun.codemodel</groupId>
-			<artifactId>codemodel</artifactId>
-			<version>${codemodel.version}</version>
+			<groupId>com.helger</groupId>
+			<artifactId>jcodemodel</artifactId>
+			<version>${jcodemodel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.collections</groupId>

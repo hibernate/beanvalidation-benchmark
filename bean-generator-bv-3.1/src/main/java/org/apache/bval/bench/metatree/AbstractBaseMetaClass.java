@@ -18,10 +18,10 @@
  */
 package org.apache.bval.bench.metatree;
 
-import com.sun.codemodel.ClassType;
-import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JCodeModel;
-import com.sun.codemodel.JDefinedClass;
+import com.helger.jcodemodel.EClassType;
+import com.helger.jcodemodel.JCodeModel;
+import com.helger.jcodemodel.JDefinedClass;
+import com.helger.jcodemodel.exceptions.JCodeModelException;
 
 
 /**
@@ -35,10 +35,10 @@ public abstract class AbstractBaseMetaClass {
     // The wrapped JDefinedClass
     private JDefinedClass generatedClass;
     
-    public AbstractBaseMetaClass(JCodeModel cm, String fqn, ClassType ct) {
+    public AbstractBaseMetaClass(JCodeModel cm, String fqn, EClassType ct) {
         try {
             this.generatedClass = cm._class(fqn, ct);
-        } catch (JClassAlreadyExistsException e) {
+        } catch (JCodeModelException e) {
             throw new IllegalStateException("Class: " + fqn + " already exists.", e);
         }
     }

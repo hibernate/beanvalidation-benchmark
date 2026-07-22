@@ -19,7 +19,7 @@
 package org.apache.bval.bench.jsr303;
 
 import org.apache.bval.bench.metatree.AbstractMetaInterface;
-import com.sun.codemodel.JCodeModel;
+import com.helger.jcodemodel.JCodeModel;
 
 
 /**

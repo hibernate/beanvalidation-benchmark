@@ -48,7 +48,7 @@
         <expressly-6.version>6.0.0</expressly-6.version>
 
 		<!-- Plugin versions -->
-		<maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
 		<maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
 
 		<!-- Other dependencies versions -->
@@ -386,6 +386,20 @@
 					<source>${version.java.target}</source>
 					<target>${version.java.target}</target>
 				</configuration>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.openjdk.jmh</groupId>
+									<artifactId>jmh-generator-annprocess</artifactId>
+									<version>${jmh.version}</version>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
